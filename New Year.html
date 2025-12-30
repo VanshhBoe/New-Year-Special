@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A New Year's Gift</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. Aesthetic Pinkish Colors & Variables --- */
+        :root {
+            --blush: #F4E8E8; 
+            --mauve: #9C6674; 
+            --rose: #E3B4B4; 
+            --cream: #FFFCFC; 
+            --text-dark: #333333;
+        }
+
+        /* --- 2. Global Styling and Background --- */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--blush);
+            color: var(--text-dark);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            position: relative; 
+        }
+
+        .page-container {
+            background-color: var(--cream);
+            border-radius: 20px;
+            padding: 50px;
+            max-width: 650px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
+            position: relative; 
+            z-index: 10;
+            /* Added margin for vertical breathing room */
+            margin: 20px 0; 
+        }
+        
+        /* FIX: Absolutely position the proposal page */
+        #proposalPage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            display: flex; 
+            flex-direction: column;
+            align-items: center;
+            
+            transform: translate(-50%, -50%) scale(0.95);
+            opacity: 0;
+            display: none; 
+            
+            padding: 50px;
+            max-width: 650px;
+            box-sizing: border-box;
+            background-color: var(--cream); 
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        #introPage {
+            display: flex; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- 3. Image Styling (NEW) --- */
+        .partner-image {
+            width: 100%;
+            max-width: 350px; /* Control size */
+            height: auto;
+            border-radius: 10px; /* Soft rounded corners */
+            margin-bottom: 25px;
+            /* Subtle pink border and glow */
+            border: 3px solid var(--rose); 
+            box-shadow: 0 0 15px rgba(156, 102, 116, 0.5);
+            object-fit: cover;
+        }
+
+        /* --- 4. Typography --- */
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--mauve);
+            font-size: 3.5em;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+        
+        .intro-title {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--mauve);
+            font-size: 4.5em; 
+            margin-bottom: 20px;
+            line-height: 1.1;
+        }
+
+        h2 {
+            font-family: 'Cormorant Garamond', serif;
+            color: var(--rose);
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            font-weight: 300;
+        }
+
+        .proposal-question {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--mauve);
+            margin: 30px 0;
+            animation: pulse 2s infinite; 
+        }
+
+        /* --- 5. Buttons --- */
+        .primary-button {
+            background-color: var(--mauve);
+            color: var(--cream);
+            border: none;
+            padding: 18px 50px;
+            font-size: 1.6em;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.2s ease-out;
+            box-shadow: 0 10px 20px rgba(156, 102, 116, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .primary-button:hover {
+            background-color: #7d4e5a;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(156, 102, 116, 0.6);
+        }
+        
+        /* --- 6. Confirmation Pop-up Styles --- */
+        #confirmation {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.95); 
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .confirmation-box {
+            background-color: var(--cream);
+            padding: 60px 40px;
+            border-radius: 15px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            transform: scale(0.5); 
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; 
+        }
+
+        .confirmation-box .yay-text {
+            color: var(--rose);
+            font-size: 3em; 
+            font-weight: 700;
+            margin-bottom: 0; 
+            line-height: 1.1;
+        }
+        
+        /* Animations and Canvas */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes popIn { 
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; 
+            z-index: 900;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="confetti-canvas"></canvas>
+
+    <div id="introPage" class="page-container">
+        <p class="intro-title">Happy New Year! 🥂</p>
+        
+        <img src="HERR.jpeg" alt="Photo of my partner, who I adore." class="partner-image">
+        
+        <p style="font-size: 1.4em; color: var(--mauve); font-weight: 600;">
+            This year has been magical because of you.
+        </p>
+        <p style="font-size: 1.2em;">
+            I have one more special gift for you, something I’ve been preparing for a long time. Please click below to open it.
+        </p>
+        <button id="nextButton" class="primary-button">NEXT</button>
+    </div>
+
+    <div id="proposalPage">
+        <h1>A New Year, A New Beginning 💖</h1>
+
+        <h2>My Heartfelt Truth</h2>
+        <p>
+            I've thought about this a lot, and I genuinely care about you. I feel a connection I can't ignore anymore. I don't want to rush you or pressure you, but I'd really like to know if you'd be open to giving us a chance and seeing where this could go.
+        </p>
+        <p>
+            Whatever you feel, I respect it completely.
+        </p>
+
+        <h2>Let's Start Our Story Together ✨</h2>
+        <p>
+            Our time together has been the best part of the last year. You make every day brighter, and I can't imagine facing the future without you by my side.
+        </p>
+
+        <p class="proposal-question">
+            Will you go to 2026 with me... and every year after? 🥂💕
+        </p>
+
+        <button id="yesButton" class="primary-button">YES, I WILL!</button>
+    </div>
+
+    <div id="confirmation">
+        <div class="confirmation-box">
+            <p class="yay-text">YAYYY TYYYSSMMM!!!</p>
+        </div>
+    </div>
+
+    <script>
+        const introPage = document.getElementById('introPage');
+        const proposalPage = document.getElementById('proposalPage');
+        const nextButton = document.getElementById('nextButton');
+        const yesButton = document.getElementById('yesButton');
+        const confirmation = document.getElementById('confirmation');
+        const confettiCanvas = document.getElementById('confetti-canvas');
+        
+        // Initialize Confetti
+        const myConfetti = confetti.create(confettiCanvas, {
+            resize: true,
+            useWorker: true
+        });
+
+        // Function to launch the confetti animation
+        function launchConfetti() {
+            myConfetti({
+                particleCount: 200,
+                spread: 180,
+                startVelocity: 60,
+                origin: { y: 0.5, x: 0.5 },
+                colors: [
+                    '#9C6674', // Mauve
+                    '#E3B4B4', // Rose
+                    '#ffd700', // Gold
+                    '#ffffff'  // White
+                ],
+                shapes: ['square', 'circle', 'star'],
+                disableForReducedMotion: true
+            });
+        }
+        
+        // --- 1. NEXT BUTTON LOGIC (Intro to Proposal) ---
+        nextButton.addEventListener('click', function() {
+            // Smoothly fade and shrink the intro page
+            introPage.style.opacity = '0';
+            introPage.style.transform = 'scale(0.95)';
+
+            setTimeout(() => {
+                // Hide the intro page fully
+                introPage.style.display = 'none';
+                
+                // Show the proposal page and start the transition
+                proposalPage.style.display = 'flex'; 
+                
+                // Small delay to ensure display:flex is applied before starting opacity transition
+                setTimeout(() => {
+                    proposalPage.style.opacity = '1';
+                    proposalPage.style.transform = 'translate(-50%, -50%) scale(1)'; // Final scale 1
+                }, 50); 
+
+            }, 700); // Matches the fade-out duration
+        });
+
+        // --- 2. YES BUTTON LOGIC (Proposal to Confirmation/Confetti) ---
+        yesButton.addEventListener('click', function() {
+            // Smoothly hide the proposal content
+            proposalPage.style.opacity = '0';
+            proposalPage.style.transform = 'translate(-50%, -50%) scale(0.95)';
+
+            setTimeout(() => {
+                // Hide the proposal page
+                proposalPage.style.display = 'none';
+
+                // Show the confirmation pop-up
+                confirmation.style.display = 'flex';
+                // Trigger the fade in and pop-in animation
+                setTimeout(() => {
+                    confirmation.style.opacity = '1';
+                    launchConfetti(); // LAUNCH THE ANIMATION!
+                }, 50); 
+            }, 600); 
+        });
+    </script>
+</body>
+</html>
