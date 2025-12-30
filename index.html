@@ -41,11 +41,9 @@
             transition: opacity 0.7s ease-in-out, transform 0.7s ease-in-out;
             position: relative; 
             z-index: 10;
-            /* Added margin for vertical breathing room */
             margin: 20px 0; 
         }
         
-        /* FIX: Absolutely position the proposal page */
         #proposalPage {
             position: absolute;
             top: 50%;
@@ -73,7 +71,7 @@
             align-items: center;
         }
 
-        /* --- 3. Image Styling (NEW) --- */
+        /* --- 3. Image Styling --- */
         .partner-image {
             width: 100%;
             max-width: 350px; /* Control size */
@@ -310,6 +308,22 @@
 
         // --- 2. YES BUTTON LOGIC (Proposal to Confirmation/Confetti) ---
         yesButton.addEventListener('click', function() {
+            
+            // *** START OF TRACKING CODE (ADDED HERE) ***
+            // Your unique Google Form Submission URL (corrected from your view link)
+            const GOOGLE_FORM_SUBMIT_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeHOFBS5XtdtvtHTglFhyqvNAjIyjkrQkNTRXjdwM1OlDbTBg/formResponse'; 
+            
+            // Send a silent request to the Google Form to record the click
+            fetch(GOOGLE_FORM_SUBMIT_URL, {
+                method: 'POST',
+                mode: 'no-cors' 
+            }).then(() => {
+                 console.log("Proposal click recorded!");
+            }).catch(error => {
+                 console.error("Tracking error:", error);
+            });
+            // *** END OF TRACKING CODE ***
+
             // Smoothly hide the proposal content
             proposalPage.style.opacity = '0';
             proposalPage.style.transform = 'translate(-50%, -50%) scale(0.95)';
